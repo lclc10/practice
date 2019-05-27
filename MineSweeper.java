@@ -5,6 +5,7 @@ import java.util.Collections;
 public class MineSweeper
 {
 	public static String[][] board;
+	public static String mineSign = "M"; //so if I change it don't have to change it multiple places
 	
 	public static void main(String[] args)
 	{
@@ -24,7 +25,6 @@ public class MineSweeper
 				board[i][j]=Integer.toString(0);
 				
 		//need to randomly generate the mines. How to get nonrepeating random numbers? https://stackoverflow.com/questions/8115722/generating-unique-random-numbers-in-java
-		
 		ArrayList<Integer> randlist = new ArrayList<Integer>();
         for (int i=1; i<=height*width; i++) //for generating the mines each square of the board gets a number, starting a 1, running across rows then down columns. Number of squares is thus width*height
         {
@@ -33,13 +33,47 @@ public class MineSweeper
         Collections.shuffle(randlist);
         for (int i=0; i<mines; i++) 
         {
-            System.out.println(randlist.get(i));
+            //System.out.println(randlist.get(i));
             //mapping the generated mine location onto the board (had to figure out how to do)
             int modresult = randlist.get(i)%width-1;
             int y = (modresult == -1) ? width-1 : modresult;
             int x = (modresult == -1) ? randlist.get(i)/width-1 : randlist.get(i)/width;
-            board[x][y]="M";
+            board[x][y]=mineSign;
         }
+        
+        //get the about-mine numbers for each square
+        int numMines=0;
+        for(int i=0; i<board.length; i++)
+        {
+			for(int j=0; j<board[0].length; j++)
+			{
+				//spaces with mines are left alone
+				if(!board[i][j].equals(mineSign)) //break caused it to break out of both loops so changing
+				{	
+					numMines=0;
+					//tally up how many mines are around the space, with if statements to watch for edges
+					if(i>0 && board[i-1][j].equals(mineSign))
+						numMines++;
+					if(i<height-1 && board[i+1][j].equals(mineSign))
+						numMines++;
+					if(j>0 && board[i][j-1].equals(mineSign))
+						numMines++;
+					if(j<width-1 && board[i][j+1].equals(mineSign))
+						numMines++;
+				
+					if(i>0 && j>0 && board[i-1][j-1].equals(mineSign))
+						numMines++;
+					if(i<height-1 && j>0 && board[i+1][j-1].equals(mineSign))
+						numMines++;
+					if(i>0 && j<width-1 && board[i-1][j+1].equals(mineSign))
+						numMines++;
+					if(i<height-1 && j<width-1 && board[i+1][j+1].equals(mineSign))
+						numMines++;
+				
+				board[i][j]=Integer.toString(numMines);
+				}
+			}
+		}
 			
 	}
 	
